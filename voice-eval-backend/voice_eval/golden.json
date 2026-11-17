@@ -1,0 +1,159 @@
+{
+  "_doc": "Golden set: the labelled truth each session is scored against. intent/outcome/slots are what a correct agent produces. 'script' is what the human or clip says (also the WER reference when reading the script). Add rows freely: items x symptoms x noise is the matrix.",
+  "scenarios": [
+    {
+      "id": "book_ac_inspection",
+      "title": "AC not cooling - book inspection",
+      "item": "AC-100",
+      "symptom": "not cooling",
+      "intent": "book_service",
+      "outcome": "booked",
+      "slots": {
+        "customer_name": "Sam Rivera",
+        "phone": "5550100",
+        "item_id": "AC-100",
+        "issue_description": "~cool",
+        "service_type": "inspection"
+      },
+      "script": [
+        "Hi, I would like to book an inspection for my air conditioner. It is not cooling. My name is Sam Rivera and my phone number is five five five, zero one zero zero. The earliest slot is fine.",
+        "Yes, that price is fine. Please go ahead and book it."
+      ],
+      "max_turns": 4
+    },
+    {
+      "id": "fridge_leaking_book",
+      "title": "Fridge leaking - book repair (empathy)",
+      "item": "RF-200",
+      "symptom": "leaking water",
+      "intent": "book_service",
+      "outcome": "booked",
+      "slots": {
+        "customer_name": "Priya Nair",
+        "phone": "5550142",
+        "item_id": "RF-200",
+        "brand": "LG",
+        "issue_description": "~leak",
+        "service_type": "repair"
+      },
+      "script": [
+        "Hello, my LG refrigerator is leaking water all over the kitchen floor and I am really worried about the food. I need a repair. My name is Priya Nair, phone five five five, zero one four two.",
+        "Yes, that is correct. Please book the earliest slot."
+      ],
+      "max_turns": 4
+    },
+    {
+      "id": "washer_noisy_book",
+      "title": "Washer loud noise - book inspection",
+      "item": "WM-300",
+      "symptom": "loud banging noise",
+      "intent": "book_service",
+      "outcome": "booked",
+      "slots": {
+        "customer_name": "Daniel Okafor",
+        "phone": "5550177",
+        "item_id": "WM-300",
+        "brand": "Whirlpool",
+        "issue_description": "~nois",
+        "service_type": "inspection"
+      },
+      "script": [
+        "Hi, my Whirlpool washing machine is making a loud banging noise during the spin cycle. Can I book an inspection? Daniel Okafor, phone five five five, zero one seven seven.",
+        "Yes, go ahead and book it."
+      ],
+      "max_turns": 4
+    },
+    {
+      "id": "tv_no_display_book",
+      "title": "TV no display - book inspection",
+      "item": "TV-600",
+      "symptom": "no picture",
+      "intent": "book_service",
+      "outcome": "booked",
+      "slots": {
+        "customer_name": "Mei Chen",
+        "phone": "5550123",
+        "item_id": "TV-600",
+        "brand": "Sony",
+        "issue_description": "~pic",
+        "service_type": "inspection"
+      },
+      "script": [
+        "Hello, the screen on my Sony television stays black, there is sound but no picture. I would like an inspection. I am Mei Chen, phone five five five, zero one two three.",
+        "Yes please, book it."
+      ],
+      "max_turns": 4
+    },
+    {
+      "id": "water_heater_cold_book",
+      "title": "Water heater no hot water - express",
+      "item": "WH-400",
+      "symptom": "no hot water",
+      "intent": "book_service",
+      "outcome": "booked",
+      "slots": {
+        "customer_name": "Omar Haddad",
+        "phone": "5550166",
+        "item_id": "WH-400",
+        "issue_description": "~hot",
+        "service_type": "repair",
+        "urgency": "express"
+      },
+      "script": [
+        "Hi, I have no hot water at home since this morning. It is the water heater. I need an express repair please. Omar Haddad, phone five five five, zero one six six.",
+        "Yes, that works. Please book it."
+      ],
+      "max_turns": 4
+    },
+    {
+      "id": "cost_quote",
+      "title": "Quote AC repair cost",
+      "item": "AC-100",
+      "symptom": "",
+      "intent": "get_quote",
+      "outcome": "quote_given",
+      "slots": {},
+      "script": [
+        "Hi. Which appliances can you service, and how much would a repair on the air conditioner cost?"
+      ],
+      "max_turns": 2
+    },
+    {
+      "id": "express_slots",
+      "title": "Earliest express appointment",
+      "item": "",
+      "symptom": "",
+      "intent": "check_availability",
+      "outcome": "slots_given",
+      "slots": {},
+      "script": [
+        "When is the earliest appointment you have for express service?"
+      ],
+      "max_turns": 2
+    },
+    {
+      "id": "unserviceable_item",
+      "title": "Out of scope - car engine",
+      "item": "",
+      "symptom": "",
+      "intent": "out_of_scope",
+      "outcome": "declined",
+      "slots": {},
+      "script": [
+        "Can you fix the engine of my car?"
+      ],
+      "max_turns": 2
+    },
+    {
+      "id": "free_form",
+      "title": "Free-form exploratory call (no golden)",
+      "item": "",
+      "symptom": "",
+      "intent": null,
+      "outcome": null,
+      "slots": {},
+      "script": [],
+      "max_turns": 10
+    }
+  ]
+}

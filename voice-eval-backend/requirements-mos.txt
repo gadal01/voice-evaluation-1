@@ -1,0 +1,5 @@
+# TTS naturalness metrics (optional, heavy). The API reports "skipped" for them when these are absent.
+speechmos
+onnxruntime
+torch
+torchaudio

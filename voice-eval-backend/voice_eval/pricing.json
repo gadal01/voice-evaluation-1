@@ -1,0 +1,10 @@
+{
+  "_doc": "PLACEHOLDER RATES. Replace with the numbers from your AWS bill / pricing page before trusting cost figures. Cost = speech in/out tokens (derived from audio seconds) + judge tokens.",
+  "verified": false,
+  "speech_tokens_per_second": 25,
+  "speech_input_usd_per_1k_tokens": 0.0034,
+  "speech_output_usd_per_1k_tokens": 0.0136,
+  "judge_input_usd_per_1k_tokens": 0.0008,
+  "judge_output_usd_per_1k_tokens": 0.0032,
+  "per_session_fixed_usd": 0.0
+}

@@ -1,0 +1,2581 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Voice agent evaluation API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/golden": {
+      "get": {
+        "summary": "Get Golden",
+        "operationId": "get_golden_api_golden_get",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoldenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sessions": {
+      "post": {
+        "summary": "Save Session",
+        "description": "Stores one recorded session. `meta` and `events` are JSON strings; caller is 16 kHz WAV, agent is 24 kHz WAV.",
+        "operationId": "save_session_api_sessions_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_save_session_api_sessions_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedSession"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List Sessions",
+        "operationId": "list_sessions_api_sessions_get",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionRow"
+                  },
+                  "title": "Response List Sessions Api Sessions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sessions/{sid}": {
+      "get": {
+        "summary": "Get Session",
+        "operationId": "get_session_api_sessions__sid__get",
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sid"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetail"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sessions/{sid}/audio/{who}": {
+      "get": {
+        "summary": "Get Audio",
+        "operationId": "get_audio_api_sessions__sid__audio__who__get",
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sid"
+            }
+          },
+          {
+            "name": "who",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Who"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sessions/{sid}/review": {
+      "post": {
+        "summary": "Save Review",
+        "description": "Human spot check: {naturalness: 1-5, pronunciation: 1-5, mispronounced: \"...\", notes: \"...\", reviewer: \"...\"}.",
+        "operationId": "save_review_api_sessions__sid__review_post",
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sid"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Review"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Review"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/sessions/{sid}/evaluate": {
+      "post": {
+        "summary": "Evaluate",
+        "operationId": "evaluate_api_sessions__sid__evaluate_post",
+        "parameters": [
+          {
+            "name": "sid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sid"
+            }
+          },
+          {
+            "name": "use_llm",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Use Llm"
+            }
+          },
+          {
+            "name": "use_mos",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Use Mos"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evaluation"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/summary": {
+      "get": {
+        "summary": "Summary",
+        "description": "Aggregate over all evaluated sessions, grouped by scenario and by condition (clean / noisy ...).",
+        "operationId": "summary_api_summary_get",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clips": {
+      "get": {
+        "summary": "List Clips",
+        "operationId": "list_clips_api_clips_get",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Add Clip",
+        "description": "Adds a human recording of a scripted line to the caller clip library (source human:<name>).",
+        "operationId": "add_clip_api_clips_post",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_add_clip_api_clips_post"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClipSaved"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clips/{clip_id}/pcm": {
+      "get": {
+        "summary": "Clip Pcm",
+        "description": "The stored clip as raw PCM16 16 kHz, optionally mixed with a noise recording at the given SNR (WER-under-noise replay).",
+        "operationId": "clip_pcm_api_clips__clip_id__pcm_get",
+        "parameters": [
+          {
+            "name": "clip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Clip Id"
+            }
+          },
+          {
+            "name": "noise",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "none",
+              "title": "Noise"
+            }
+          },
+          {
+            "name": "snr_db",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "number",
+              "maximum": 40,
+              "minimum": -5,
+              "default": 15.0,
+              "title": "Snr Db"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/clips/{clip_id}/audio": {
+      "get": {
+        "summary": "Clip Audio",
+        "operationId": "clip_audio_api_clips__clip_id__audio_get",
+        "parameters": [
+          {
+            "name": "clip_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Clip Id"
+            }
+          },
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Api-Key"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AudioResult": {
+        "properties": {
+          "caller": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AudioStats"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "agent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AudioStats"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "caller_speech_s": {
+            "type": "number",
+            "title": "Caller Speech S"
+          },
+          "agent_speech_s": {
+            "type": "number",
+            "title": "Agent Speech S"
+          }
+        },
+        "type": "object",
+        "required": [
+          "caller_speech_s",
+          "agent_speech_s"
+        ],
+        "title": "AudioResult"
+      },
+      "AudioStats": {
+        "properties": {
+          "duration_s": {
+            "type": "number",
+            "title": "Duration S"
+          },
+          "peak_dbfs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Dbfs"
+          },
+          "clipping_pct": {
+            "type": "number",
+            "title": "Clipping Pct"
+          },
+          "noise_floor_dbfs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Noise Floor Dbfs"
+          },
+          "snr_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snr Db"
+          }
+        },
+        "type": "object",
+        "required": [
+          "duration_s",
+          "clipping_pct"
+        ],
+        "title": "AudioStats"
+      },
+      "BargeInResult": {
+        "properties": {
+          "interrupts": {
+            "type": "integer",
+            "title": "Interrupts"
+          },
+          "false": {
+            "type": "integer",
+            "title": "False"
+          },
+          "false_times": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "False Times"
+          },
+          "false_rate": {
+            "type": "number",
+            "title": "False Rate"
+          },
+          "missed": {
+            "type": "integer",
+            "title": "Missed"
+          },
+          "agent_turns": {
+            "type": "integer",
+            "title": "Agent Turns"
+          }
+        },
+        "type": "object",
+        "required": [
+          "interrupts",
+          "false",
+          "false_times",
+          "false_rate",
+          "missed",
+          "agent_turns"
+        ],
+        "title": "BargeInResult"
+      },
+      "Body_add_clip_api_clips_post": {
+        "properties": {
+          "scenario": {
+            "type": "string",
+            "title": "Scenario"
+          },
+          "turn": {
+            "type": "integer",
+            "title": "Turn"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "wav": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Wav"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario",
+          "turn",
+          "name",
+          "wav"
+        ],
+        "title": "Body_add_clip_api_clips_post"
+      },
+      "Body_save_session_api_sessions_post": {
+        "properties": {
+          "meta": {
+            "type": "string",
+            "title": "Meta"
+          },
+          "events": {
+            "type": "string",
+            "title": "Events"
+          },
+          "caller": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Caller"
+          },
+          "agent": {
+            "type": "string",
+            "contentMediaType": "application/octet-stream",
+            "title": "Agent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "events",
+          "caller",
+          "agent"
+        ],
+        "title": "Body_save_session_api_sessions_post"
+      },
+      "ClipLine": {
+        "properties": {
+          "scenario": {
+            "type": "string",
+            "title": "Scenario"
+          },
+          "turn": {
+            "type": "integer",
+            "title": "Turn"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "reactive": {
+            "type": "boolean",
+            "title": "Reactive"
+          },
+          "clips": {
+            "items": {
+              "$ref": "#/components/schemas/ClipRef"
+            },
+            "type": "array",
+            "title": "Clips"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenario",
+          "turn",
+          "text",
+          "reactive",
+          "clips"
+        ],
+        "title": "ClipLine"
+      },
+      "ClipRef": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "duration_s": {
+            "type": "number",
+            "title": "Duration S"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "duration_s"
+        ],
+        "title": "ClipRef"
+      },
+      "ClipSaved": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "duration_s": {
+            "type": "number",
+            "title": "Duration S"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/AudioStats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "duration_s",
+          "audio"
+        ],
+        "title": "ClipSaved"
+      },
+      "ClipsResponse": {
+        "properties": {
+          "lines": {
+            "items": {
+              "$ref": "#/components/schemas/ClipLine"
+            },
+            "type": "array",
+            "title": "Lines"
+          },
+          "sources": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "noises": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Noises"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lines",
+          "sources",
+          "noises"
+        ],
+        "title": "ClipsResponse"
+      },
+      "Condition": {
+        "properties": {
+          "noise": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Noise"
+          },
+          "snr_db": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snr Db"
+          }
+        },
+        "type": "object",
+        "title": "Condition"
+      },
+      "CostResult": {
+        "properties": {
+          "agent_usd": {
+            "type": "number",
+            "title": "Agent Usd"
+          },
+          "judge_usd": {
+            "type": "number",
+            "title": "Judge Usd"
+          },
+          "total_usd": {
+            "type": "number",
+            "title": "Total Usd"
+          },
+          "speech_in_usd": {
+            "type": "number",
+            "title": "Speech In Usd"
+          },
+          "speech_out_usd": {
+            "type": "number",
+            "title": "Speech Out Usd"
+          },
+          "estimate": {
+            "type": "boolean",
+            "title": "Estimate"
+          }
+        },
+        "type": "object",
+        "required": [
+          "agent_usd",
+          "judge_usd",
+          "total_usd",
+          "speech_in_usd",
+          "speech_out_usd",
+          "estimate"
+        ],
+        "title": "CostResult"
+      },
+      "Evaluation": {
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/OutcomeResult"
+          },
+          "slots": {
+            "$ref": "#/components/schemas/SlotsResult"
+          },
+          "turns_to_resolution": {
+            "$ref": "#/components/schemas/TurnsResult"
+          },
+          "intent": {
+            "$ref": "#/components/schemas/IntentResult"
+          },
+          "wer": {
+            "$ref": "#/components/schemas/WerResult"
+          },
+          "latency": {
+            "$ref": "#/components/schemas/LatencyResult"
+          },
+          "barge_in": {
+            "$ref": "#/components/schemas/BargeInResult"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/CostResult"
+          },
+          "tools": {
+            "$ref": "#/components/schemas/ToolsResult"
+          },
+          "audio": {
+            "$ref": "#/components/schemas/AudioResult"
+          },
+          "segments": {
+            "$ref": "#/components/schemas/Segments"
+          },
+          "judge": {
+            "$ref": "#/components/schemas/JudgeResult"
+          },
+          "intent_llm": {
+            "$ref": "#/components/schemas/IntentLlmResult"
+          },
+          "mos": {
+            "$ref": "#/components/schemas/MosResult"
+          },
+          "evaluated_at": {
+            "type": "string",
+            "title": "Evaluated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "outcome",
+          "slots",
+          "turns_to_resolution",
+          "intent",
+          "wer",
+          "latency",
+          "barge_in",
+          "cost",
+          "tools",
+          "audio",
+          "segments",
+          "judge",
+          "intent_llm",
+          "mos",
+          "evaluated_at"
+        ],
+        "title": "Evaluation"
+      },
+      "GoldenResponse": {
+        "properties": {
+          "scenarios": {
+            "items": {
+              "$ref": "#/components/schemas/GoldenScenario"
+            },
+            "type": "array",
+            "title": "Scenarios"
+          },
+          "pricing_verified": {
+            "type": "boolean",
+            "title": "Pricing Verified"
+          }
+        },
+        "type": "object",
+        "required": [
+          "scenarios",
+          "pricing_verified"
+        ],
+        "title": "GoldenResponse"
+      },
+      "GoldenScenario": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "item": {
+            "type": "string",
+            "title": "Item",
+            "default": ""
+          },
+          "symptom": {
+            "type": "string",
+            "title": "Symptom",
+            "default": ""
+          },
+          "intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intent"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          },
+          "slots": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Slots",
+            "default": {}
+          },
+          "script": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Script",
+            "default": []
+          },
+          "max_turns": {
+            "type": "integer",
+            "title": "Max Turns",
+            "default": 4
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title"
+        ],
+        "title": "GoldenScenario"
+      },
+      "GroupStats": {
+        "properties": {
+          "sessions": {
+            "type": "integer",
+            "title": "Sessions"
+          },
+          "task_success": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Success"
+          },
+          "wer": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wer"
+          },
+          "slot_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slot Accuracy"
+          },
+          "intent_accuracy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intent Accuracy"
+          },
+          "turns_to_resolution": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Turns To Resolution"
+          },
+          "ttfa_p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ttfa P50 Ms"
+          },
+          "false_barge_in_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "False Barge In Rate"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "tone": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tone"
+          },
+          "clarity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clarity"
+          },
+          "empathy": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Empathy"
+          },
+          "utmos": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Utmos"
+          },
+          "dnsmos": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dnsmos"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sessions"
+        ],
+        "title": "GroupStats"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "IntentLlmResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "intent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Intent"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "tokens": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JudgeTokens"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "IntentLlmResult"
+      },
+      "IntentResult": {
+        "properties": {
+          "labelled": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Labelled"
+          },
+          "predicted_trace": {
+            "type": "string",
+            "title": "Predicted Trace"
+          },
+          "trace_correct": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trace Correct"
+          },
+          "predicted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "correct": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Correct"
+          }
+        },
+        "type": "object",
+        "required": [
+          "predicted_trace"
+        ],
+        "title": "IntentResult"
+      },
+      "JudgeResult": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "scores": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scores"
+          },
+          "overall": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overall"
+          },
+          "pass": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pass"
+          },
+          "issues": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Issues",
+            "default": []
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "tokens": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/JudgeTokens"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "JudgeResult"
+      },
+      "JudgeTokens": {
+        "properties": {
+          "in": {
+            "type": "integer",
+            "title": "In",
+            "default": 0
+          },
+          "out": {
+            "type": "integer",
+            "title": "Out",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "JudgeTokens"
+      },
+      "LatencyResult": {
+        "properties": {
+          "values_ms": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Values Ms"
+          },
+          "p50_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P50 Ms"
+          },
+          "p95_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P95 Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "values_ms"
+        ],
+        "title": "LatencyResult"
+      },
+      "MosResult": {
+        "properties": {
+          "dnsmos": {
+            "$ref": "#/components/schemas/MosScore"
+          },
+          "utmos": {
+            "$ref": "#/components/schemas/MosScore"
+          }
+        },
+        "type": "object",
+        "required": [
+          "dnsmos",
+          "utmos"
+        ],
+        "title": "MosResult"
+      },
+      "MosScore": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "utmos": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Utmos"
+          },
+          "ovrl_mos": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ovrl Mos"
+          },
+          "sig_mos": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sig Mos"
+          },
+          "bak_mos": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bak Mos"
+          },
+          "p808_mos": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P808 Mos"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "MosScore"
+      },
+      "OutcomeResult": {
+        "properties": {
+          "actual": {
+            "type": "string",
+            "title": "Actual"
+          },
+          "golden": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Golden"
+          },
+          "task_success": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Success"
+          },
+          "forbidden_booking": {
+            "type": "boolean",
+            "title": "Forbidden Booking",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "actual"
+        ],
+        "title": "OutcomeResult"
+      },
+      "Review": {
+        "properties": {
+          "naturalness": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Naturalness"
+          },
+          "pronunciation": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pronunciation"
+          },
+          "mispronounced": {
+            "type": "string",
+            "title": "Mispronounced",
+            "default": ""
+          },
+          "notes": {
+            "type": "string",
+            "title": "Notes",
+            "default": ""
+          },
+          "reviewer": {
+            "type": "string",
+            "title": "Reviewer",
+            "default": ""
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          }
+        },
+        "type": "object",
+        "title": "Review"
+      },
+      "SavedSession": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "title": "SavedSession"
+      },
+      "Segments": {
+        "properties": {
+          "caller": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Caller"
+          },
+          "agent": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Agent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "caller",
+          "agent"
+        ],
+        "title": "Segments"
+      },
+      "SessionDetail": {
+        "properties": {
+          "meta": {
+            "$ref": "#/components/schemas/SessionMeta"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/SessionEvent"
+            },
+            "type": "array",
+            "title": "Events"
+          },
+          "evaluation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Evaluation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "review": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Review"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "meta",
+          "events"
+        ],
+        "title": "SessionDetail"
+      },
+      "SessionEvent": {
+        "properties": {
+          "t": {
+            "type": "number",
+            "title": "T"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "args": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Args"
+          },
+          "result": {
+            "title": "Result"
+          },
+          "ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ms"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "conversation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "t",
+          "type"
+        ],
+        "title": "SessionEvent",
+        "description": "One WebSocket event stamped with seconds since Record. Extra fields depend on `type`:\ntranscript/reply -> text; tool -> name, args, result, ms; error -> message; ready -> conversation_id."
+      },
+      "SessionMeta": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "created": {
+            "type": "string",
+            "title": "Created"
+          },
+          "scenario_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenario Id"
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Condition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reference_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Text"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "caller_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caller Mode"
+          },
+          "conversation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "tester": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tester"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created"
+        ],
+        "title": "SessionMeta"
+      },
+      "SessionRow": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "created": {
+            "type": "string",
+            "title": "Created"
+          },
+          "scenario_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scenario Id"
+          },
+          "condition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Condition"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reference_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Text"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "caller_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caller Mode"
+          },
+          "conversation_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conversation Id"
+          },
+          "duration_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration S"
+          },
+          "tester": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tester"
+          },
+          "evaluated": {
+            "type": "boolean",
+            "title": "Evaluated",
+            "default": false
+          },
+          "task_success": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task Success"
+          },
+          "outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Outcome"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "created"
+        ],
+        "title": "SessionRow"
+      },
+      "SlotDetail": {
+        "properties": {
+          "expected": {
+            "type": "string",
+            "title": "Expected"
+          },
+          "got": {
+            "title": "Got"
+          },
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          }
+        },
+        "type": "object",
+        "required": [
+          "expected",
+          "ok"
+        ],
+        "title": "SlotDetail"
+      },
+      "SlotsResult": {
+        "properties": {
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "slots": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SlotDetail"
+            },
+            "type": "object",
+            "title": "Slots",
+            "default": {}
+          },
+          "note": {
+            "type": "string",
+            "title": "Note",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "title": "SlotsResult"
+      },
+      "SummaryResponse": {
+        "properties": {
+          "overall": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GroupStats"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "by_scenario": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GroupStats"
+            },
+            "type": "object",
+            "title": "By Scenario"
+          },
+          "by_condition": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/GroupStats"
+            },
+            "type": "object",
+            "title": "By Condition"
+          },
+          "pricing_verified": {
+            "type": "boolean",
+            "title": "Pricing Verified"
+          }
+        },
+        "type": "object",
+        "required": [
+          "by_scenario",
+          "by_condition",
+          "pricing_verified"
+        ],
+        "title": "SummaryResponse"
+      },
+      "ToolCallSummary": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "args": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Args"
+          },
+          "ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "args"
+        ],
+        "title": "ToolCallSummary"
+      },
+      "ToolsResult": {
+        "properties": {
+          "calls": {
+            "items": {
+              "$ref": "#/components/schemas/ToolCallSummary"
+            },
+            "type": "array",
+            "title": "Calls"
+          },
+          "errors": {
+            "type": "integer",
+            "title": "Errors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "calls",
+          "errors"
+        ],
+        "title": "ToolsResult"
+      },
+      "TurnsResult": {
+        "properties": {
+          "turns": {
+            "type": "integer",
+            "title": "Turns"
+          },
+          "total_user_turns": {
+            "type": "integer",
+            "title": "Total User Turns"
+          },
+          "resolved": {
+            "type": "boolean",
+            "title": "Resolved"
+          },
+          "agent_replies": {
+            "type": "integer",
+            "title": "Agent Replies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "turns",
+          "total_user_turns",
+          "resolved",
+          "agent_replies"
+        ],
+        "title": "TurnsResult"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WerResult": {
+        "properties": {
+          "wer": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wer"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errors"
+          },
+          "words": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Words"
+          },
+          "sub": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sub"
+          },
+          "del": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Del"
+          },
+          "ins": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ins"
+          },
+          "hypothesis": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hypothesis"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "WerResult"
+      }
+    }
+  }
+}

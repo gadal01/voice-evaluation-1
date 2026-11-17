@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+mcp>=1.12,<2  # 2.x renamed the server API (FastMCP -> MCPServer)
+aws_sdk_bedrock_runtime[awscrt]  # Python 3.12+
+pyjwt
+
+# only needed for test_auth.py
+httpx
+websockets

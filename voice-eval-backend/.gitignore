@@ -1,0 +1,14 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# call recordings and local state
+data/
+# local TTS model files (hundreds of MB): download them, see README
+batch/models/
+# batch run output and TTS cache
+batch/results/
+batch/results_sweep/
+batch/cache/
+batch/samples*/
