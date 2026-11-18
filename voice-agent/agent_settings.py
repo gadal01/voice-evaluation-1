@@ -5,7 +5,7 @@ Real environment variables win over the nearest `.env`. Unknown variables in `.e
     JWT_SECRET, AUTH_API_KEY, JWT_TTL_SECONDS      WebSocket authentication (see auth.py)
     AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN      credentials for Bedrock
     NOVA_SONIC_MODEL_ID, NOVA_SONIC_VOICE, NOVA_SONIC_PROMPT                      the speech model
-    MCP_SERVER_URL, PORT, CORS_ORIGINS                                             tools, the listening port, optional CORS
+    MCP_SERVER_URL, PORT                                                           tools and the listening port
 """
 from functools import lru_cache
 
@@ -30,7 +30,6 @@ class AgentSettings(BaseSettings):
     nova_sonic_voice: str = "matthew"                     # matthew, tiffany, amy, ...
     nova_sonic_prompt: str | None = None                  # overrides the built-in system prompt
 
-    cors_origins: str = ""                                 # comma-separated browser origins allowed to call /auth/token; empty = no CORS
     mcp_server_url: str | None = None                     # default: the sample service mounted in this app
     port: int = Field(8000, ge=1, le=65535)
 

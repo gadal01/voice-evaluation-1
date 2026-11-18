@@ -3,8 +3,6 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-# call recordings and local state
-data/
 # local TTS model files (hundreds of MB): download them, see README
 batch/models/
 # batch run output and TTS cache

@@ -1,1 +1,1 @@
-"""QA console for the voice agent under test: record live sessions, score them, collect human baseline clips."""
+"""Scoring and LLM-judge library for the voice agent under test (the Streamlit app and the batch runner live beside it)."""

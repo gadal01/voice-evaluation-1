@@ -1,6 +1,6 @@
 # voice-agent
 
-Sample voice agent: the **system under test** for the evaluation tools in `voice-eval-backend` and `voice-eval-ui`.
+Sample voice agent: the **system under test** for the evaluation tools in `voice-eval-backend`.
 Amazon Nova Sonic (speech-to-speech on Bedrock) with tools served over MCP, behind a WebSocket protected by short-lived JWTs.
 
 ```
@@ -28,10 +28,5 @@ Python 3.12+ is required by the AWS Bedrock streaming SDK. Each call is a real B
 3. Client -> server: binary PCM16 mono 16 kHz. Server -> client: binary PCM16 mono 24 kHz, plus JSON events
    `ready | transcript | reply | interrupted | tool | error`.
 
-## Browser clients on another origin
-`POST /auth/token` is a cross-origin request when the QA UI is served from elsewhere. Set `CORS_ORIGINS` (comma-separated)
-to allow exactly those origins; unset means no CORS headers at all. The WebSocket itself needs no CORS.
-
-## Related repos
-- `voice-eval-backend`: scoring, LLM-as-judge, clip library, batch runner (calls this agent over the protocol above).
-- `voice-eval-ui`: the QA console (record sessions, evaluate, record baseline human clips).
+## Related
+`../voice-eval-backend` evaluates this agent: its runner talks to it over the protocol above.

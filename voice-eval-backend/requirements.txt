@@ -1,8 +1,6 @@
-fastapi
-uvicorn[standard]
+streamlit>=1.40
 pydantic-settings
 python-dotenv
-python-multipart
 numpy
 jiwer
 soundfile

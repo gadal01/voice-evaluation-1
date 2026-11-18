@@ -19,7 +19,6 @@ import uuid
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
@@ -45,12 +44,6 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="Nova Sonic Voice Agent", lifespan=lifespan)
 app.mount("/mcp", mcp.streamable_http_app())  # routes: /mcp/
-
-# Browser clients served from another origin (for example the QA console UI) need CORS for POST /auth/token.
-# Off by default; set CORS_ORIGINS="http://localhost:5173,https://qa.example.com" to allow specific origins.
-if get_settings().cors_origins:
-    app.add_middleware(CORSMiddleware, allow_origins=[o.strip() for o in get_settings().cors_origins.split(",") if o.strip()],
-                       allow_methods=["POST", "GET"], allow_headers=["X-API-Key", "Content-Type"])
 
 
 @app.get("/")
