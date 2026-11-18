@@ -1,20 +1,20 @@
 """The simulated user: decides WHAT to say next. HOW it sounds (Piper) is decided elsewhere.
 
   StaticUser   a fixed list of lines (the scenario's static_turns), the same every run: regression testing
-  DynamicUser  an LLM plays the customer from the scenario's goal, facts and persona and reacts to what the agent just said
+  DynamicUser  a Strands agent (Amazon Bedrock model) that plays the customer from the scenario's goal, facts and persona,
+               remembers the conversation, reacts to what the voice agent just said, and hangs up by calling its
+               `end_conversation` tool
 
 Both implement next_line(history) -> str | None, where history is [{"user": str, "agent": str}, ...] for the turns so far.
 None means "hang up".
 """
 import json
 from pathlib import Path
-from typing import Callable
 
-from sim import llm
 from sim.config import ROOT, get_settings
 from sim.text import spoken
 
-END = "[END]"
+FIRST = "The voice session is open and the assistant is listening. Say your first line."
 
 
 def load_scenarios(path: Path | None = None) -> dict[str, dict]:
@@ -50,35 +50,51 @@ def system_prompt(scenario: dict) -> str:
         '- Say phone numbers as words, digit by digit ("five five five, zero one zero zero").\n'
         "- If the assistant reads details back and they are correct, confirm clearly. If something is wrong, correct it.\n"
         "- Never invent facts that are not listed above. If you do not know something, say you are not sure.\n"
-        f"- When your goal is complete, or the assistant cannot help, say a brief thanks and end your message with {END}."
+        "- When your goal is complete, or the assistant cannot help, do NOT reply normally: call the end_conversation tool with your "
+        "brief thanks as the farewell."
     )
 
 
 class DynamicUser:
     mode = "dynamic"
 
-    def __init__(self, scenario: dict, complete: Callable[..., str] | None = None, model: str | None = None) -> None:
+    def __init__(self, scenario: dict, agent=None, model: str | None = None) -> None:
+        """`agent` is anything callable with a prompt that returns the reply text (a Strands Agent; a fake in tests).
+        By default a Strands Agent is built on the Bedrock model USER_MODEL, authenticated with the Bedrock API key."""
         self.scenario = scenario
         self.max_turns = scenario.get("max_turns", 6)
-        self._complete = complete or llm.complete
-        self._model = model or get_settings().user_model
-        self._system = system_prompt(scenario)
         self._done = False
+        self._farewell: str | None = None
+        self._agent = agent if agent is not None else self._build_agent(model or get_settings().user_model)
 
-    def _messages(self, history: list[dict]) -> list[dict]:
-        out = [llm.msg("user", "The voice session is open and the assistant is listening. Say your first line.")]
-        for turn in history:
-            out.append(llm.msg("assistant", turn["user"]))
-            said = turn["agent"].strip() or "(the assistant said nothing)"
-            out.append(llm.msg("user", f"The assistant says: {said}"))
-        return out
+    def end_conversation(self, farewell: str) -> str:
+        """What the agent's `end_conversation` tool does: remember the last words and stop after them."""
+        self._farewell = farewell
+        return "The session is closed. Do not say anything else."
+
+    def _build_agent(self, model_id: str):
+        from strands import Agent, tool
+        from strands.models import BedrockModel
+
+        s = get_settings()
+        if not s.aws_bearer_token_bedrock:
+            raise RuntimeError("AWS_BEARER_TOKEN_BEDROCK is not set in .env")
+
+        @tool
+        def end_conversation(farewell: str) -> str:
+            """Hang up. Call this once your goal is complete or the assistant cannot help. `farewell` is the last thing you say aloud."""
+            return self.end_conversation(farewell)
+
+        model = BedrockModel(model_id=model_id, region_name=s.aws_region, api_key=s.aws_bearer_token_bedrock, temperature=0.7, max_tokens=300)
+        return Agent(model=model, system_prompt=system_prompt(self.scenario), tools=[end_conversation], callback_handler=None)
 
     def next_line(self, history: list[dict]) -> str | None:
+        """The Strands agent keeps the conversation itself, so only the newest thing the voice agent said is passed in."""
         if self._done or len(history) >= self.max_turns:
             return None
-        text = self._complete(self._system, self._messages(history), self._model)
-        if END in text:
-            self._done = True
-            text = text.replace(END, "")
+        prompt = FIRST if not history else f"The assistant says: {history[-1]['agent'].strip() or '(the assistant said nothing)'}"
+        text = str(self._agent(prompt)).strip()
+        if self._farewell is not None:               # the agent hung up: its farewell is the last line, then no more
+            text, self._done = self._farewell, True
         text = spoken(text.strip().strip('"').strip())
         return text or None

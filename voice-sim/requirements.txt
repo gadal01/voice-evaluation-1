@@ -7,3 +7,6 @@ boto3
 python-dotenv
 pydantic-settings
 piper-tts
+strands-agents
+fastapi
+uvicorn[standard]

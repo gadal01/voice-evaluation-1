@@ -1,4 +1,4 @@
-"""One thin wrapper over Bedrock Converse, used by the dynamic user and the judge. Auth is the Bedrock API key only."""
+"""One thin wrapper over Bedrock Converse, used by the judge (the dynamic user is a Strands agent, see user.py). Auth is the Bedrock API key only."""
 import os
 
 from sim.config import get_settings

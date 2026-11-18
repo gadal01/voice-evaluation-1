@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tests"))
 
-from fake_agent import API_KEY, make_agent, serve, tone  # noqa: E402
+from fake_agent import API_KEY, FakeStrandsAgent, make_agent, serve, tone  # noqa: E402
 
 from sim import judge  # noqa: E402
 from sim.user import load_scenarios  # noqa: E402
@@ -46,7 +46,7 @@ def speaker(i, text):
 
 
 def open_session(tmp_path, url, **kw):
-    kw = {"url": url, "api_key": API_KEY, "settle": 0.5, "speaker": speaker, "complete": lambda *a, **k: GOOD_JUDGE, **kw}
+    kw = {"url": url, "api_key": API_KEY, "settle": 0.5, "speaker": speaker, **kw}
     return asyncio.run(run_session(SCENARIO, "static", "v", tmp_path / "01_session", **kw))
 
 
@@ -116,10 +116,19 @@ def test_agent_not_running_is_a_clear_error(tmp_path):
     assert r["passed"] is False and "cannot reach the agent" in r["error"]
 
 
-def test_dynamic_session_uses_the_llm_user_and_stops_on_end(agent, tmp_path, monkeypatch):
+def test_dynamic_session_uses_the_strands_user_and_stops_when_it_hangs_up(agent, tmp_path, monkeypatch):
     judge_with(monkeypatch)
-    lines = iter(["Hi, my air conditioner is not cooling.", "Yes please book it. [END]"])
+    fake = FakeStrandsAgent(["Hi, my air conditioner is not cooling.", "HANGUP: Yes please book it."])
+    from sim.user import DynamicUser
+    import sim.run
+    monkeypatch.setattr(sim.run, "DynamicUser", lambda scenario, user_agent=None: _attach(DynamicUser(scenario, agent=fake), fake))
     r = asyncio.run(run_session(SCENARIO, "dynamic", "v", tmp_path / "02_session", url=agent(script()), api_key=API_KEY, settle=0.5,
-                             speaker=speaker, complete=lambda *a, **k: next(lines)))
+                                speaker=speaker))
     assert r["error"] is None and [t["said"] for t in r["turns"]] == ["Hi, my air conditioner is not cooling.", "Yes please book it."]
     assert r["turns"][0]["reply"].startswith("That comes to") and r["mode"] == "dynamic"
+    assert fake.prompts[1] == f"The assistant says: {r['turns'][0]['reply']}"         # the voice agent's reply reached the user agent
+
+
+def _attach(user, fake):
+    fake.user = user
+    return user

@@ -76,3 +76,19 @@ def make_agent(script: list[dict], silent: bool = False) -> FastAPI:
                     await ws.send_bytes(tone(step.get("audio_s", 1.0), 24000))
 
     return app
+
+
+class FakeStrandsAgent:
+    """Stands in for the Strands agent that plays the user: returns scripted lines, and a reply starting with "HANGUP:"
+    simulates the model calling its end_conversation tool. Set `.user` to the DynamicUser it is attached to."""
+
+    def __init__(self, replies: list[str]) -> None:
+        self.replies, self.prompts, self.user = iter(replies), [], None
+
+    def __call__(self, prompt: str) -> str:
+        self.prompts.append(prompt)
+        reply = next(self.replies)
+        if reply.startswith("HANGUP:"):
+            self.user.end_conversation(reply.removeprefix("HANGUP:").strip())
+            return "(ignored: the farewell argument wins)"
+        return reply

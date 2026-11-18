@@ -17,9 +17,11 @@ import argparse
 import asyncio
 import itertools
 import json
+import re
 import statistics
 import sys
 import traceback
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Callable
@@ -27,7 +29,7 @@ from typing import Callable
 from sim import clips, judge, tts
 from sim.session import Session, SessionError, get_token, write_wav
 from sim.user import DynamicUser, StaticUser, load_scenarios
-from sim.config import ROOT, get_settings
+from sim.config import get_settings
 from sim.report import render_report
 
 MAX_SILENT_TURNS = 2   # hang up after this many unanswered lines in a row
@@ -41,9 +43,9 @@ def default_speaker(mode: str, scenario: dict, voice: str) -> Callable[[int, str
 
 async def run_session(scenario: dict, mode: str, voice: str, out_dir: Path, *, url: str, api_key: str = "", judge_on: bool = True,
                    settle: float = 2.5, token: str | None = None, speaker: Callable[[int, str], bytes] | None = None,
-                   complete: Callable[..., str] | None = None) -> dict:
+                   user_agent=None) -> dict:
     """One session from start to judged result. Never raises: a failure is recorded in result["error"]."""
-    user = StaticUser(scenario) if mode == "static" else DynamicUser(scenario, complete)
+    user = StaticUser(scenario) if mode == "static" else DynamicUser(scenario, user_agent)
     speak = speaker or default_speaker(mode, scenario, voice)
     out = {"scenario": scenario["id"], "title": scenario["title"], "mode": mode, "voice": voice, "error": None, "traceback": None,
            "turns": [], "judge": None, "passed": None, "dir": out_dir.name, "duration_s": 0.0}
@@ -113,65 +115,117 @@ def summarize(results: list[dict]) -> dict:
     return {"overall": aggregate(results), "by_mode": by("mode"), "by_scenario": by("scenario")}
 
 
-# ---------------------------------------------------------------------- cli ---
+# ------------------------------------------------------------------- engine ---
+class RunError(Exception):
+    """A run cannot start: a bad option or a missing prerequisite. The message says what to fix."""
+
+
+@dataclass
+class RunOptions:
+    mode: str = "static"                       # static | dynamic | both
+    scenarios: list[str] = field(default_factory=list)   # empty = all
+    voice: str = clips.DEFAULT_VOICE
+    repeat: int = 1
+    concurrency: int = 1
+    url: str = ""                              # agent websocket; empty = AGENT_URL
+    settle: float = 2.5
+    judge: bool = True
+
+
 def preflight(scenarios: list[dict], modes: list[str], voice: str, judge_on: bool) -> None:
     """Fail before spending anything if a prerequisite is missing."""
     s = get_settings()
     if not s.auth_api_key:
-        raise SystemExit("AUTH_API_KEY is not set in .env (it must match the agent's)")
+        raise RunError("AUTH_API_KEY is not set in .env (it must match the agent's)")
     needs_llm = judge_on or "dynamic" in modes
     if needs_llm and not s.aws_bearer_token_bedrock:
-        raise SystemExit("AWS_BEARER_TOKEN_BEDROCK is not set in .env (needed for the judge and the dynamic user; use --no-judge with --mode static to skip)")
+        raise RunError("AWS_BEARER_TOKEN_BEDROCK is not set in .env (needed for the judge and the dynamic user; use --no-judge with --mode static to skip)")
     if "dynamic" in modes and (why := tts.available(voice)):
-        raise SystemExit(why)
+        raise RunError(why)
     if "static" in modes:
         for sc in scenarios:
             for i, text in enumerate(sc["static_turns"]):
                 try:
                     clips.get(sc["id"], i, text, voice)
                 except (LookupError, ValueError) as exc:
-                    raise SystemExit(str(exc))
+                    raise RunError(str(exc))
 
 
-async def main_async(args: argparse.Namespace) -> int:
-    s = get_settings()
+def plan(opts: RunOptions) -> tuple[list[dict], list[str]]:
+    """Validates the options and the prerequisites. Returns (scenarios, modes) or raises RunError."""
     everything = load_scenarios()
-    wanted = [x for x in args.scenarios.split(",") if x] or list(everything)
+    wanted = opts.scenarios or list(everything)
     unknown = [x for x in wanted if x not in everything]
     if unknown:
-        raise SystemExit(f"unknown scenario(s) {unknown}; available: {', '.join(everything)}")
+        raise RunError(f"unknown scenario(s) {unknown}; available: {', '.join(everything)}")
+    if opts.mode not in ("static", "dynamic", "both"):
+        raise RunError(f"mode must be static, dynamic or both, not {opts.mode!r}")
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+", opts.voice):
+        raise RunError(f"invalid voice name {opts.voice!r}")
+    if opts.repeat < 1 or opts.concurrency < 1:
+        raise RunError("repeat and concurrency must be at least 1")
     scenarios = [everything[x] for x in wanted]
-    modes = ["static", "dynamic"] if args.mode == "both" else [args.mode]
-    judge_on = not args.no_judge
-    preflight(scenarios, modes, args.voice, judge_on)
+    modes = ["static", "dynamic"] if opts.mode == "both" else [opts.mode]
+    preflight(scenarios, modes, opts.voice, opts.judge)
+    return scenarios, modes
 
-    run_dir = Path(args.out) if args.out else ROOT / "results" / datetime.now().strftime("%Y%m%d-%H%M%S")
-    jobs = [(sc, m, r) for sc in scenarios for m in modes for r in range(args.repeat)]
-    sem = asyncio.Semaphore(args.concurrency)
+
+async def execute(opts: RunOptions, run_dir: Path, on_result: Callable[[dict, int, int], None] | None = None) -> dict:
+    """Runs every (scenario, mode, repeat) session against the agent, judges them, writes summary.json and report.html into
+    `run_dir`, and returns the summary. `on_result(result, done, total)` is called as each session finishes. Used by the CLI
+    and by the FastAPI layer."""
+    s = get_settings()
+    scenarios, modes = plan(opts)
+    url = opts.url or s.agent_url
+    jobs = [(sc, m) for sc in scenarios for m in modes for _ in range(opts.repeat)]
+    run_dir.mkdir(parents=True, exist_ok=True)
+    (run_dir / "run.json").write_text(json.dumps({"options": asdict(opts), "created": datetime.now().isoformat(timespec="seconds"),
+                                                  "total": len(jobs)}, indent=2), encoding="utf-8")
+    sem = asyncio.Semaphore(opts.concurrency)
     results: list[dict] = []
-    print(f"{len(jobs)} session(s) -> {run_dir}   mode={args.mode} voice={args.voice} judge={'on' if judge_on else 'off'}")
 
     async def one(n: int, sc: dict, mode: str) -> None:
         async with sem:
-            res = await run_session(sc, mode, args.voice, run_dir / f"{n:02d}_{sc['id']}_{mode}", url=args.url or s.agent_url,
-                                 api_key=s.auth_api_key, judge_on=judge_on, settle=args.settle)
+            res = await run_session(sc, mode, opts.voice, run_dir / f"{n:02d}_{sc['id']}_{mode}", url=url, api_key=s.auth_api_key,
+                                    judge_on=opts.judge, settle=opts.settle)
         results.append(res)
+        if on_result:
+            on_result(res, len(results), len(jobs))
+
+    await asyncio.gather(*(one(i + 1, sc, m) for i, (sc, m) in enumerate(jobs)))
+    results.sort(key=lambda r: r["dir"])
+    summary = {"meta": {"created": datetime.now().isoformat(timespec="seconds"), "url": url, "mode": opts.mode, "voice": opts.voice,
+                        "repeat": opts.repeat, "judge_model": s.judge_model if opts.judge else None,
+                        "user_model": s.user_model if "dynamic" in modes else None},
+               **summarize(results)}
+    (run_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    (run_dir / "report.html").write_text(render_report(results, summary), encoding="utf-8")
+    return summary
+
+
+# ---------------------------------------------------------------------- cli ---
+async def main_async(args: argparse.Namespace) -> int:
+    opts = RunOptions(mode=args.mode, scenarios=[x for x in args.scenarios.split(",") if x], voice=args.voice, repeat=args.repeat,
+                      concurrency=args.concurrency, url=args.url, settle=args.settle, judge=not args.no_judge)
+    run_dir = Path(args.out) if args.out else get_settings().results_dir / datetime.now().strftime("%Y%m%d-%H%M%S")
+    try:
+        scenarios, modes = plan(opts)
+    except RunError as exc:
+        raise SystemExit(str(exc))
+    print(f"{len(scenarios) * len(modes) * opts.repeat} session(s) -> {run_dir}   mode={opts.mode} voice={opts.voice} judge={'on' if opts.judge else 'off'}")
+
+    def show(res: dict, done: int, total: int) -> None:
         j = res["judge"]
         mark = "PASS" if res["passed"] else ("FAIL" if res["passed"] is False else "done")
         detail = res["error"] or (f"judge {j['overall']}" if j and j["status"] == "ok" else (j or {}).get("reason", ""))
-        print(f"  {mark}  {sc['id']:<28} {mode:<8} {res['duration_s']:>5.1f}s  {detail}")
+        print(f"  {mark}  {res['scenario']:<28} {res['mode']:<8} {res['duration_s']:>5.1f}s  {detail}")
 
-    await asyncio.gather(*(one(i + 1, sc, m) for i, (sc, m, _) in enumerate(jobs)))
-    results.sort(key=lambda r: r["dir"])
-    summary = {"meta": {"created": datetime.now().isoformat(timespec="seconds"), "url": args.url or s.agent_url, "mode": args.mode,
-                        "voice": args.voice, "repeat": args.repeat, "judge_model": s.judge_model if judge_on else None,
-                        "user_model": s.user_model if "dynamic" in modes else None},
-               **summarize(results)}
-    run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "summary.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    (run_dir / "report.html").write_text(render_report(results, summary), encoding="utf-8")
+    try:
+        summary = await execute(opts, run_dir, show)
+    except RunError as exc:
+        raise SystemExit(str(exc))
     o = summary["overall"]
-    print(f"\n{o['passed']}/{o['sessions']} passed" + (f", judge {o['judge_overall']}" if o["judge_overall"] else "") + f"   report: {run_dir / 'report.html'}")
+    print("\n" + f"{o['passed']}/{o['sessions']} passed" + (f", judge {o['judge_overall']}" if o["judge_overall"] else "") + f"   report: {run_dir / 'report.html'}")
     return 1 if args.fail_on_fail and o["passed"] < o["sessions"] else 0
 
 

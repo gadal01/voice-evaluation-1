@@ -1,6 +1,6 @@
 # voice-sim
 
-A **simulated user** that talks to the voice agent under test over its **websocket**, and an **LLM judge** that scores each session.
+A **simulated user** that talks to the voice agent under test over its **websocket**, an **LLM judge** that scores each session, and a **FastAPI layer** to drive both over HTTP.
 There is no telephony: the agent is a websocket service protected by a token, and the simulated user plays the part of a person speaking into a microphone.
 
 ## How a session works
@@ -19,8 +19,9 @@ voice-sim                                   voice-agent (system under test)
 ## Where the user's speech comes from (always a Piper voice)
 - **static**: the scenario's fixed lines, rendered once and stored as WAV clips in `clips/`. Every run replays identical audio, so this is the
   regression test.
-- **dynamic**: an LLM plays the customer from the scenario's goal, facts and persona and reacts to what the agent just said; each line is spoken by
-  Piper on the fly (cached by text). It finds problems a fixed script never reaches.
+- **dynamic**: a **Strands agent** (Amazon Bedrock model) plays the customer from the scenario's goal, facts and persona. It remembers the conversation,
+  reacts to what the agent just said, and hangs up by calling its `end_conversation` tool; each line is spoken by Piper on the fly (cached by text).
+  It finds problems a fixed script never reaches.
 
 ## The judge
 An LLM on Bedrock reads the whole conversation and scores task success, accuracy, policy, voice style, tone and empathy (1-5). A session passes when every
@@ -29,12 +30,12 @@ score is at least 4. It judges the words the agent spoke, as text: it cannot hea
 ```
 sim/
   session.py    one session over the websocket: token, real-time 30 ms audio frames, turns, both audio tracks on one timeline
-  user.py       StaticUser and DynamicUser (decide WHAT to say next)
+  user.py       StaticUser and DynamicUser, the Strands agent (decide WHAT to say next)
   tts.py        Piper voices with a text cache         clips.py   static clips: render / list / verify (checksummed)
-  judge.py      the LLM judge                          llm.py     Bedrock Converse wrapper (API key auth)
-  run.py        the CLI: run scenarios, judge, write the report     report.py   HTML report     text.py  spoken digits, WER
+  judge.py      the LLM judge                          llm.py     Bedrock Converse wrapper for the judge (API key auth)
+  run.py        the engine (plan, execute) and the CLI      api.py     the FastAPI layer      report.py   HTML report     text.py  spoken digits, WER
 scenarios.json  goal, facts, persona, static lines and what a correct agent does (8 scenarios; add your own)
-clips/          stored static clips (en_US-lessac-medium)         tests/   pytest, no AWS and no agent needed (a fake agent is included)
+clips/          stored static clips (en_US-lessac-medium)         tests/   pytest, no AWS and no agent needed (a fake voice agent is included)
 ```
 
 ## Setup
@@ -42,7 +43,7 @@ clips/          stored static clips (en_US-lessac-medium)         tests/   pytes
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 .\.venv\Scripts\python.exe -m piper.download_voices --download-dir models en_US-lessac-medium      # ~60 MB, once
-copy .env.example .env      # AUTH_API_KEY (the agent's), AWS_BEARER_TOKEN_BEDROCK (dynamic user + judge)
+copy .env.example .env      # AUTH_API_KEY (the agent's), AWS_BEARER_TOKEN_BEDROCK (dynamic user + judge), optional SIM_API_KEY
 ```
 Python 3.12 recommended. The stored static clips replay without the Piper model; the model is needed for dynamic mode and to render new clips.
 
@@ -59,6 +60,32 @@ Output goes to `results/<timestamp>/`: `report.html` (summary tables, every conv
 sides), `summary.json`, and one folder per session (`session.json`, `user.wav`, `agent.wav`). Open the report from that folder so the audio links work.
 Use `--fail-on-fail` to make the exit code non-zero when any session fails (CI). Every session is a real Bedrock session and costs money, and dynamic
 mode and the judge add LLM requests.
+
+## FastAPI layer
+The same engine as the CLI, over HTTP. Start it (the agent still has to be running for runs to work):
+```powershell
+.\.venv\Scripts\python.exe -m sim.api          # http://127.0.0.1:8100   interactive docs: /docs
+```
+Every route except `/health` needs the header `X-API-Key` (`SIM_API_KEY`, or `AUTH_API_KEY` if that is not set): a run opens real, paid Bedrock sessions.
+
+| Route | What it does |
+|---|---|
+| `GET /health` | liveness (no key) |
+| `GET /scenarios`, `GET /voices` | the scenarios; Piper voices installed and voices with stored clips |
+| `POST /runs` | start a run in the background (returns `202` and a run id). Body: `mode` (`static`/`dynamic`/`both`), `scenarios` (ids, empty = all), `voice`, `repeat`, `concurrency`, `settle`, `judge`. Prerequisites are checked first, so a bad request fails here with `400`/`422` |
+| `GET /runs`, `GET /runs/{id}` | list runs; status, progress (`done` of `total`), finished sessions, and the summary when done. Also lists runs made by the CLI |
+| `GET /runs/{id}/sessions/{name}` | one session in full: every turn (said, heard, reply, tool calls), the judge's scores |
+| `GET /runs/{id}/report.html`, `.../summary.json`, `.../{name}/user.wav`, `.../agent.wav` | the files of a run |
+| `POST /runs/{id}/cancel` | stop a running run |
+
+```powershell
+$h = @{ "X-API-Key" = "<key>" }
+$run = Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8100/runs -Headers $h -ContentType "application/json" `
+        -Body '{"mode":"static","scenarios":["cost_quote_ac"],"judge":false}'
+Invoke-RestMethod -Uri "http://127.0.0.1:8100/runs/$($run.id)" -Headers $h        # poll until status is done
+```
+Rules: one run at a time by default (`MAX_ACTIVE_RUNS`; a second `POST /runs` gets `409`). The agent tested is always `AGENT_URL` from `.env`: the request
+cannot supply a `url`, because the simulator sends the agent's API key to whatever host it tests. Runs live in `RESULTS_DIR`, the same folders the CLI writes.
 
 ## Static clips
 ```powershell

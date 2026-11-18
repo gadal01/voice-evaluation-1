@@ -7,11 +7,13 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "tests"))
 
 from sim import user, clips, judge, tts  # noqa: E402
 from sim.report import render_report  # noqa: E402
 from sim.run import aggregate, summarize  # noqa: E402
 from sim.text import normalize, spoken, wer  # noqa: E402
+from fake_agent import FakeStrandsAgent  # noqa: E402
 
 SCENARIO = user.load_scenarios()["ac_not_cooling_book"]
 
@@ -40,36 +42,61 @@ def test_static_user_plays_its_lines_then_hangs_up():
     assert c.next_line([{"user": "x", "agent": "y"}] * n) is None
 
 
-def test_dynamic_user_builds_the_conversation_and_stops_on_end():
-    seen = []
-    replies = iter(["Hi, my air conditioner is not cooling.", 'My number is 555-0100.', 'Great, thank you. [END]'])
+def attach(agent, **kw):
+    u = user.DynamicUser(SCENARIO, agent=agent, **kw)
+    agent.user = u
+    return u
 
-    def fake_llm(system, messages, model, *a, **k):
-        seen.append((system, messages))
-        return next(replies)
 
-    c = user.DynamicUser(SCENARIO, complete=fake_llm, model="m")
+def test_dynamic_user_feeds_the_agent_and_stops_when_it_hangs_up():
+    agent = FakeStrandsAgent(["Hi, my air conditioner is not cooling.", "My number is 555-0100.", "HANGUP: Great, thank you."])
+    u = attach(agent)
     history = []
-    line = c.next_line(history)
-    assert line == "Hi, my air conditioner is not cooling."
-    assert "Sam Rivera" in seen[0][0] and "five five five, zero one zero zero" in seen[0][0]   # facts reach the prompt
-    assert seen[0][1][0]["role"] == "user" and len(seen[0][1]) == 1
+    line = u.next_line(history)
+    assert line == "Hi, my air conditioner is not cooling." and agent.prompts[0] == user.FIRST
     history.append({"user": line, "agent": "Sure. What is your phone number?"})
-    line = c.next_line(history)
-    assert line == "My number is five five five zero one zero zero."                          # digits are spoken, not read as a number
-    msgs = seen[1][1]
-    assert [m["role"] for m in msgs] == ["user", "assistant", "user"]
-    assert "What is your phone number?" in msgs[2]["content"][0]["text"]
+    line = u.next_line(history)
+    assert line == "My number is five five five zero one zero zero."                      # digits are spoken, not read as a number
+    assert agent.prompts[1] == "The assistant says: Sure. What is your phone number?"       # only the newest agent reply is passed in
     history.append({"user": line, "agent": ""})
-    assert c.next_line(history) == "Great, thank you."
-    assert c.next_line(history) is None                                                         # [END] was seen: no more lines
-    assert "(the assistant said nothing)" in seen[2][1][-1]["content"][0]["text"]
+    assert u.next_line(history) == "Great, thank you."                                      # the tool's farewell is the last line
+    assert "(the assistant said nothing)" in agent.prompts[2]
+    assert u.next_line(history) is None and len(agent.prompts) == 3                         # hung up: the agent is not asked again
 
 
 def test_dynamic_user_respects_max_turns_and_empty_output():
-    c = user.DynamicUser({**SCENARIO, "max_turns": 1}, complete=lambda *a, **k: "Hello.")
-    assert c.next_line([{"user": "a", "agent": "b"}]) is None
-    assert user.DynamicUser(SCENARIO, complete=lambda *a, **k: "  [END]  ").next_line([]) is None
+    capped = user.DynamicUser({**SCENARIO, "max_turns": 1}, agent=FakeStrandsAgent(["Hello."]))
+    assert capped.next_line([{"user": "a", "agent": "b"}]) is None
+    assert user.DynamicUser(SCENARIO, agent=FakeStrandsAgent(["   "])).next_line([]) is None
+
+
+def test_system_prompt_carries_the_scenario_and_the_hangup_tool():
+    p = user.system_prompt(SCENARIO)
+    assert "Sam Rivera" in p and "five five five, zero one zero zero" in p and SCENARIO["goal"] in p and "end_conversation" in p
+
+
+def test_default_agent_is_a_strands_agent_with_the_hangup_tool(monkeypatch):
+    from sim import config
+    monkeypatch.setenv("AWS_BEARER_TOKEN_BEDROCK", "not-a-real-key")
+    config.get_settings.cache_clear()
+    try:
+        u = user.DynamicUser(SCENARIO)                       # builds the Strands Agent; no network until it is called
+        assert type(u._agent).__module__.startswith("strands") and "end_conversation" in u._agent.tool_names
+        u._agent.tool.end_conversation(farewell="Bye now.")  # the tool the model would call
+        assert u._farewell == "Bye now."
+    finally:
+        config.get_settings.cache_clear()
+
+
+def test_default_agent_needs_the_bedrock_key(monkeypatch):
+    from sim import config
+    monkeypatch.setenv("AWS_BEARER_TOKEN_BEDROCK", "")
+    config.get_settings.cache_clear()
+    try:
+        with pytest.raises(RuntimeError, match="AWS_BEARER_TOKEN_BEDROCK"):
+            user.DynamicUser(SCENARIO)
+    finally:
+        config.get_settings.cache_clear()
 
 
 def test_scenarios_file_is_valid():
