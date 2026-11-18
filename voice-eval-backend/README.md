@@ -25,7 +25,7 @@ scripts/export_openapi.py
 ```
 python -m venv .venv && .venv\Scripts\activate
 pip install -r requirements.txt          # add requirements-mos.txt for UTMOS/DNSMOS, requirements-batch.txt for the batch runner
-copy .env.example .env                   # AUTH_API_KEY (same as the agent's), AWS creds for the judge
+copy .env.example .env                   # AUTH_API_KEY (same as the agent's); AWS_BEARER_TOKEN_BEDROCK (Bedrock API key) for the judge
 python -m voice_eval                     # http://127.0.0.1:8001   docs at /docs, schema at /openapi.json
 python -m pytest tests -q                # pip install -r requirements-dev.txt first
 ```
@@ -60,7 +60,7 @@ recorded human clips. No cloud TTS (Polly, ElevenLabs) is used or supported. Mod
 `python -m piper.download_voices --download-dir batch/models en_US-lessac-medium en_GB-alba-medium`, and Kokoro's `kokoro-v1.0.onnx` +
 `voices-v1.0.bin` from the kokoro-onnx release "model-files-v1.0" into `batch/models/`. The stored Piper, Kokoro and human clips in
 `batch/caller_clips/` replay without them; the engines are only needed to render new clips (`python batch/clips.py record`).
-`*.wav` files are tracked with Git LFS. AWS credentials are used for Bedrock only (the agent's model and the LLM judge).
+`*.wav` files are tracked with Git LFS. The only AWS credential used here is `AWS_BEARER_TOKEN_BEDROCK` (Bedrock API key), for the LLM judge and intent classifier.
 
 ## Before you trust the numbers
 - `pricing.json` rates are placeholders (`"verified": false`); the UI says so.

@@ -6,6 +6,7 @@ evaluation still works. Judge scores are advisory: calibrate them against human 
 from __future__ import annotations
 
 import json
+import os
 import re
 
 from voice_eval.config import get_settings
@@ -25,10 +26,10 @@ def _client():
     import boto3
 
     s = get_settings()
-    if not (s.aws_access_key_id and s.aws_secret_access_key):
-        raise RuntimeError("AWS credentials not set in .env")
-    return boto3.client("bedrock-runtime", region_name=s.aws_region, aws_access_key_id=s.aws_access_key_id,
-                        aws_secret_access_key=s.aws_secret_access_key, aws_session_token=s.aws_session_token or None)
+    if s.aws_bearer_token_bedrock:   # Bedrock API key: boto3 reads it from the environment, .env is not copied there for us
+        os.environ["AWS_BEARER_TOKEN_BEDROCK"] = s.aws_bearer_token_bedrock
+        return boto3.client("bedrock-runtime", region_name=s.aws_region)
+    raise RuntimeError("AWS_BEARER_TOKEN_BEDROCK is not set in .env")
 
 
 def render(events: list[dict]) -> str:
