@@ -2,7 +2,7 @@ fastapi
 uvicorn[standard]
 python-dotenv
 mcp>=1.12,<2  # 2.x renamed the server API (FastMCP -> MCPServer)
-aws_sdk_bedrock_runtime[awscrt]  # Python 3.12+
+aws_sdk_bedrock_runtime[awscrt]>=0.10,<0.13  # Python 3.12+. 0.13 renamed AsyncBedrockRuntimeClient/Config, which sonic.py uses
 pyjwt
 
 # only needed for test_auth.py
