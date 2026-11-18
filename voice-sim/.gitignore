@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# Piper voice files (~60 MB each): python -m piper.download_voices --download-dir models <voice>
+models/
+# synthesized dynamic lines and run output (call recordings)
+cache/
+results/

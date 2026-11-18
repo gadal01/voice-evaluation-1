@@ -1,0 +1,9 @@
+websockets
+httpx
+numpy
+soxr
+jiwer
+boto3
+python-dotenv
+pydantic-settings
+piper-tts

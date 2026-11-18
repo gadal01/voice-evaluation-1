@@ -1,0 +1,119 @@
+{
+  "ac_not_cooling_book.t0.en_US-lessac-medium": {
+    "duration_s": 11.91,
+    "file": "ac_not_cooling_book.t0.en_US-lessac-medium.wav",
+    "scenario": "ac_not_cooling_book",
+    "sha256": "d0cd5278066b4ee9cb64cbe37bb68b7d2ef4a9d1e343d16b743ff9c7c8826652",
+    "text": "Hi, I would like to book an inspection for my Samsung air conditioner. It is not cooling. My name is Sam Rivera and my phone number is five five five, zero one zero zero. The earliest slot is fine.",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "ac_not_cooling_book.t1.en_US-lessac-medium": {
+    "duration_s": 3.17,
+    "file": "ac_not_cooling_book.t1.en_US-lessac-medium.wav",
+    "scenario": "ac_not_cooling_book",
+    "sha256": "b0a49374ca39306e85a02716a1bfaa9fcbde011d96c090a233f28b10a315ba84",
+    "text": "Yes, that price is fine. Please go ahead and book it.",
+    "turn": 1,
+    "voice": "en_US-lessac-medium"
+  },
+  "cost_quote_ac.t0.en_US-lessac-medium": {
+    "duration_s": 5.26,
+    "file": "cost_quote_ac.t0.en_US-lessac-medium.wav",
+    "scenario": "cost_quote_ac",
+    "sha256": "628dcc74e641a8965333a97b463df2542c5a332370ea0a399c138dc8a1b1c131",
+    "text": "Hi. Which appliances can you service, and how much would a repair on the air conditioner cost?",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "earliest_express_slot.t0.en_US-lessac-medium": {
+    "duration_s": 3.13,
+    "file": "earliest_express_slot.t0.en_US-lessac-medium.wav",
+    "scenario": "earliest_express_slot",
+    "sha256": "febb10c6c923a593293f2c149d1f9727bda29edac22f469b4ee6f94dc5858007",
+    "text": "When is the earliest appointment you have for express service?",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "fridge_leaking_book.t0.en_US-lessac-medium": {
+    "duration_s": 11.05,
+    "file": "fridge_leaking_book.t0.en_US-lessac-medium.wav",
+    "scenario": "fridge_leaking_book",
+    "sha256": "21cadeabc903e38ca770639193a9f2eb30f93ce9d31343f2e26e0735f7370139",
+    "text": "Hello, my LG refrigerator is leaking water all over the kitchen floor and I am really worried about the food. I need a repair. My name is Priya Nair, phone five five five, zero one four two.",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "fridge_leaking_book.t1.en_US-lessac-medium": {
+    "duration_s": 3.65,
+    "file": "fridge_leaking_book.t1.en_US-lessac-medium.wav",
+    "scenario": "fridge_leaking_book",
+    "sha256": "1529548c059481cadebc5172c0dfcc45c97b931a0500303a7b9db3cb97886889",
+    "text": "Yes, that is correct. Please book the earliest slot.",
+    "turn": 1,
+    "voice": "en_US-lessac-medium"
+  },
+  "out_of_scope_car.t0.en_US-lessac-medium": {
+    "duration_s": 1.89,
+    "file": "out_of_scope_car.t0.en_US-lessac-medium.wav",
+    "scenario": "out_of_scope_car",
+    "sha256": "6700f70ab3a5d6b784fb351941f054f3d3357e6fb2e1734cca30743e5728bf6e",
+    "text": "Can you fix the engine of my car?",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "tv_no_picture_book.t0.en_US-lessac-medium": {
+    "duration_s": 10.03,
+    "file": "tv_no_picture_book.t0.en_US-lessac-medium.wav",
+    "scenario": "tv_no_picture_book",
+    "sha256": "93c85688dc3838f19237204377af71f11e614a98613196bbabe2a33ccebf03d3",
+    "text": "Hello, the screen on my Sony television stays black, there is sound but no picture. I would like an inspection. I am Mei Chen, phone five five five, zero one two three.",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "tv_no_picture_book.t1.en_US-lessac-medium": {
+    "duration_s": 1.61,
+    "file": "tv_no_picture_book.t1.en_US-lessac-medium.wav",
+    "scenario": "tv_no_picture_book",
+    "sha256": "6e8cfe8829af9aee416d57b48675ba09b497349983b80bba6a5c3a6242f7b1d0",
+    "text": "Yes please, book it.",
+    "turn": 1,
+    "voice": "en_US-lessac-medium"
+  },
+  "washer_noisy_book.t0.en_US-lessac-medium": {
+    "duration_s": 10.55,
+    "file": "washer_noisy_book.t0.en_US-lessac-medium.wav",
+    "scenario": "washer_noisy_book",
+    "sha256": "926997029c01209272897dc75a8253c08ccdd158ab0cba318927d2cfb6d19278",
+    "text": "Hi, my Whirlpool washing machine is making a loud banging noise during the spin cycle. Can I book an inspection? Daniel Okafor, phone five five five, zero one seven seven.",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "washer_noisy_book.t1.en_US-lessac-medium": {
+    "duration_s": 2.12,
+    "file": "washer_noisy_book.t1.en_US-lessac-medium.wav",
+    "scenario": "washer_noisy_book",
+    "sha256": "7eaf56b3eabf6985f212398bd3953db3e4d38ef61f265ac91a435e9ceb6a6d62",
+    "text": "Yes, go ahead and book it.",
+    "turn": 1,
+    "voice": "en_US-lessac-medium"
+  },
+  "water_heater_express_book.t0.en_US-lessac-medium": {
+    "duration_s": 9.79,
+    "file": "water_heater_express_book.t0.en_US-lessac-medium.wav",
+    "scenario": "water_heater_express_book",
+    "sha256": "80be49c25d80b6ac0a1ccbb4c797e72e32c60661ce96a3387a2932bd85188ae7",
+    "text": "Hi, I have no hot water at home since this morning. It is the water heater. I need an express repair please. Omar Haddad, phone five five five, zero one six six.",
+    "turn": 0,
+    "voice": "en_US-lessac-medium"
+  },
+  "water_heater_express_book.t1.en_US-lessac-medium": {
+    "duration_s": 2.3,
+    "file": "water_heater_express_book.t1.en_US-lessac-medium.wav",
+    "scenario": "water_heater_express_book",
+    "sha256": "4d1da57139041ee010912f12f5da5a7630d74f8e5f050f32cd06ba50070b4cc3",
+    "text": "Yes, that works. Please book it.",
+    "turn": 1,
+    "voice": "en_US-lessac-medium"
+  }
+}

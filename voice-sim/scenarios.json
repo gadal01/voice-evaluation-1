@@ -1,0 +1,103 @@
+[
+  {
+    "id": "ac_not_cooling_book",
+    "title": "AC not cooling: book an inspection",
+    "goal": "Book an inspection visit for your air conditioner, which is not cooling. Take the earliest slot. Agree to the price when it is quoted and confirm the details when the agent reads them back.",
+    "persona": "Polite and a bit hurried. Short answers.",
+    "facts": {"name": "Sam Rivera", "phone": "five five five, zero one zero zero", "appliance": "air conditioner", "brand": "Samsung", "problem": "it is not cooling", "service": "inspection", "slot": "the earliest one"},
+    "static_turns": [
+      "Hi, I would like to book an inspection for my Samsung air conditioner. It is not cooling. My name is Sam Rivera and my phone number is five five five, zero one zero zero. The earliest slot is fine.",
+      "Yes, that price is fine. Please go ahead and book it."
+    ],
+    "expect": "The agent looks up the cost, reads the phone number back and the quoted total, and only after the user agrees creates the service request for the air conditioner (item AC-100) and reads out the request id.",
+    "max_turns": 6
+  },
+  {
+    "id": "fridge_leaking_book",
+    "title": "Fridge leaking: book a repair (worried user)",
+    "goal": "Book a repair for your refrigerator, which is leaking water on the kitchen floor. You are worried about the food. Take the earliest slot and agree to the quoted price.",
+    "persona": "Worried and a little stressed about spoiled food, but cooperative.",
+    "facts": {"name": "Priya Nair", "phone": "five five five, zero one four two", "appliance": "refrigerator", "brand": "LG", "problem": "it is leaking water all over the kitchen floor", "service": "repair", "slot": "the earliest one"},
+    "static_turns": [
+      "Hello, my LG refrigerator is leaking water all over the kitchen floor and I am really worried about the food. I need a repair. My name is Priya Nair, phone five five five, zero one four two.",
+      "Yes, that is correct. Please book the earliest slot."
+    ],
+    "expect": "The agent acknowledges the user's worry, quotes a repair for the refrigerator (RF-200), confirms the phone number and price, and after a clear yes creates the request.",
+    "max_turns": 6
+  },
+  {
+    "id": "washer_noisy_book",
+    "title": "Washer banging: book an inspection",
+    "goal": "Book an inspection for your washing machine, which bangs loudly during the spin cycle. Agree to the quoted price and take the earliest slot.",
+    "persona": "Calm and chatty.",
+    "facts": {"name": "Daniel Okafor", "phone": "five five five, zero one seven seven", "appliance": "washing machine", "brand": "Whirlpool", "problem": "it makes a loud banging noise during the spin cycle", "service": "inspection", "slot": "the earliest one"},
+    "static_turns": [
+      "Hi, my Whirlpool washing machine is making a loud banging noise during the spin cycle. Can I book an inspection? Daniel Okafor, phone five five five, zero one seven seven.",
+      "Yes, go ahead and book it."
+    ],
+    "expect": "The agent quotes an inspection for the washing machine (WM-300), reads the number and total back, and creates the request only after the user agrees.",
+    "max_turns": 6
+  },
+  {
+    "id": "tv_no_picture_book",
+    "title": "TV has sound but no picture: book an inspection",
+    "goal": "Book an inspection for your television: the screen stays black but you can hear sound. Agree to the price and take the earliest slot.",
+    "persona": "Brief and matter-of-fact.",
+    "facts": {"name": "Mei Chen", "phone": "five five five, zero one two three", "appliance": "television", "brand": "Sony", "problem": "the screen stays black, there is sound but no picture", "service": "inspection", "slot": "the earliest one"},
+    "static_turns": [
+      "Hello, the screen on my Sony television stays black, there is sound but no picture. I would like an inspection. I am Mei Chen, phone five five five, zero one two three.",
+      "Yes please, book it."
+    ],
+    "expect": "The agent quotes an inspection for the television (TV-600), confirms details and creates the request after a clear yes.",
+    "max_turns": 6
+  },
+  {
+    "id": "water_heater_express_book",
+    "title": "No hot water: express repair",
+    "goal": "You have had no hot water since this morning. Book an EXPRESS repair for the water heater. Agree to the price and the first express slot offered.",
+    "persona": "Annoyed about the cold shower but polite; wants it fixed fast.",
+    "facts": {"name": "Omar Haddad", "phone": "five five five, zero one six six", "appliance": "water heater", "brand": "", "problem": "no hot water since this morning", "service": "repair, express", "slot": "the first express slot"},
+    "static_turns": [
+      "Hi, I have no hot water at home since this morning. It is the water heater. I need an express repair please. Omar Haddad, phone five five five, zero one six six.",
+      "Yes, that works. Please book it."
+    ],
+    "expect": "The agent quotes an EXPRESS repair for the water heater (WH-400) and books it only after the user agrees.",
+    "max_turns": 6
+  },
+  {
+    "id": "cost_quote_ac",
+    "title": "Ask what is serviceable and what an AC repair costs",
+    "goal": "Find out which appliances can be serviced and how much a repair on the air conditioner costs. Do NOT book anything: thank the agent and finish after you get the price.",
+    "persona": "Curious, just comparing prices.",
+    "facts": {"appliance": "air conditioner", "service": "repair"},
+    "static_turns": [
+      "Hi. Which appliances can you service, and how much would a repair on the air conditioner cost?"
+    ],
+    "expect": "The agent lists serviceable items and quotes the air conditioner repair price from its tools (no invented numbers). It offers to book but must NOT create a service request.",
+    "max_turns": 3
+  },
+  {
+    "id": "earliest_express_slot",
+    "title": "Ask for the earliest express appointment",
+    "goal": "Ask when the earliest appointment for express service is. Do NOT book anything: thank the agent and finish once you know.",
+    "persona": "Neutral.",
+    "facts": {},
+    "static_turns": [
+      "When is the earliest appointment you have for express service?"
+    ],
+    "expect": "The agent looks up available express slots and states the earliest one. It must NOT create a service request.",
+    "max_turns": 3
+  },
+  {
+    "id": "out_of_scope_car",
+    "title": "Out of scope: car engine",
+    "goal": "Ask whether they can fix the engine of your car. If they say no, accept it politely and end the conversation. Do not ask for anything else.",
+    "persona": "Casual.",
+    "facts": {"appliance": "car engine"},
+    "static_turns": [
+      "Can you fix the engine of my car?"
+    ],
+    "expect": "The agent politely says it only services appliances and similar items, may mention what it can service, and does NOT create a service request.",
+    "max_turns": 3
+  }
+]

@@ -1,8 +1,0 @@
-streamlit>=1.40
-pydantic-settings
-python-dotenv
-numpy
-jiwer
-soundfile
-soxr
-boto3

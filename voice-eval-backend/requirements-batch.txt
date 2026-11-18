@@ -1,9 +1,0 @@
--r requirements.txt
-# batch runner (batch/run_evals.py): synthetic callers talk to the live agent
-websockets
-httpx
-scipy
-audiomentations
-# Synthetic caller voices: Piper and Kokoro (needed only to render NEW clips; stored clips replay without them)
-# piper-tts
-# kokoro-onnx
