@@ -1,7 +1,7 @@
-"""Voice-agent eval harness: synthetic callers (Polly / ElevenLabs) talk to the live WebSocket agent.
+"""Voice-agent eval harness: synthetic callers (Piper and Kokoro voices, stored human clips) talk to the live WebSocket agent.
 
     python batch/run_evals.py                                  # default voices, all scenarios
-    python batch/run_evals.py --voices polly:Joanna,eleven:Rachel --scenarios cost_quote,book_ac_inspection
+    python batch/run_evals.py --voices piper:en_US-lessac-medium,kokoro:af_heart,clip:human:alice --scenarios cost_quote,book_ac_inspection
     python batch/run_evals.py --repeat 3 --augment phone --concurrency 2
     python batch/run_evals.py --augment noisy --noise-snr 12 --no-judge
 
@@ -52,7 +52,7 @@ import tts  # noqa: E402
 HERE = Path(__file__).parent
 FRAME_BYTES, FRAME_S = 960, 0.03          # 30 ms of 16 kHz PCM16
 OUT_BYTES_PER_S = 24_000 * 2              # agent audio is 24 kHz PCM16
-DEFAULT_VOICES = "polly:Joanna,polly:Matthew,polly:Amy,polly:Kajal,eleven:Rachel,eleven:Adam"
+DEFAULT_VOICES = "piper:en_US-lessac-medium,piper:en_GB-alba-medium,kokoro:af_heart,kokoro:am_michael"
 SETTLE_S = 3.0                            # quiet time that means "the agent finished this turn"
 TURN_TIMEOUT_S = 60
 # Signs the model is reading its own reasoning / tool names aloud instead of just answering the caller.
@@ -317,7 +317,7 @@ def print_table(rows: list[list[str]]) -> None:
 async def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--url", default="ws://127.0.0.1:8000/ws")
-    ap.add_argument("--voices", default=DEFAULT_VOICES, help="comma list, e.g. polly:Joanna,eleven:Rachel")
+    ap.add_argument("--voices", default=DEFAULT_VOICES, help="comma list, e.g. piper:en_US-lessac-medium,kokoro:af_heart,clip:human:alice")
     ap.add_argument("--scenarios", default="all", help="comma list of scenario ids")
     ap.add_argument("--repeat", type=int, default=1, help="runs per scenario/voice (the model is non-deterministic)")
     ap.add_argument("--augment", default="clean", choices=augment.PROFILES, help="degrade the caller audio (audiomentations)")

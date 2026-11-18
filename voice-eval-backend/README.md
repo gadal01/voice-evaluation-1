@@ -14,7 +14,7 @@ voice_eval/              the evaluation API (FastAPI)
   quality.py             UTMOS / DNSMOS (optional deps)
   golden.json            labelled scenarios: intent, outcome, slots, script
   pricing.json           PLACEHOLDER cost rates
-batch/                   the script harness: synthetic callers (Polly/ElevenLabs/Kokoro/Piper/clips) talk to the live agent
+batch/                   the script harness: synthetic callers (Piper and Kokoro voices, stored human clips) talk to the live agent
   run_evals.py  clips.py  metrics.py  judge.py  augment.py  noises.py  baseline.py  report.py  tts.py  dialogue.py
   scenarios.json  caller_clips/  noise/  baselines/
 tests/                   pytest, no AWS and no agent needed
@@ -55,10 +55,12 @@ pip install -r requirements-batch.txt
 python batch/run_evals.py --voices clip:human:alice --scenarios book_ac_inspection --repeat 3 --augment noisy --noise-snr 10
 python batch/clips.py list
 ```
-Results go to `batch/results/<timestamp>/` (ignored by git). Local TTS models are not in the repo: put Kokoro
-(`kokoro-v1.0.onnx`, `voices-v1.0.bin` from the kokoro-onnx release "model-files-v1.0") and Piper voices
-(`python -m piper.download_voices --download-dir batch/models en_US-lessac-medium`) in `batch/models/`. The stored caller clips
-in `batch/caller_clips/` already replay without them. `*.wav` files are tracked with Git LFS.
+Results go to `batch/results/<timestamp>/` (ignored by git). **Synthetic callers are Piper and Kokoro** (open source, local); real callers are
+recorded human clips. No cloud TTS (Polly, ElevenLabs) is used or supported. Model files are not in the repo: Piper voices via
+`python -m piper.download_voices --download-dir batch/models en_US-lessac-medium en_GB-alba-medium`, and Kokoro's `kokoro-v1.0.onnx` +
+`voices-v1.0.bin` from the kokoro-onnx release "model-files-v1.0" into `batch/models/`. The stored Piper, Kokoro and human clips in
+`batch/caller_clips/` replay without them; the engines are only needed to render new clips (`python batch/clips.py record`).
+`*.wav` files are tracked with Git LFS. AWS credentials are used for Bedrock only (the agent's model and the LLM judge).
 
 ## Before you trust the numbers
 - `pricing.json` rates are placeholders (`"verified": false`); the UI says so.

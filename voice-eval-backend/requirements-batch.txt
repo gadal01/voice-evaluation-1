@@ -4,6 +4,6 @@ websockets
 httpx
 scipy
 audiomentations
-# local TTS voices for synthetic callers (optional; Polly/ElevenLabs/SAPI need no extra package)
-# kokoro-onnx
+# Synthetic caller voices: Piper and Kokoro (needed only to render NEW clips; stored clips replay without them)
 # piper-tts
+# kokoro-onnx

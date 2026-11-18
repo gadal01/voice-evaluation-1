@@ -86,7 +86,7 @@ def _babble(rng, t):
              "Welcome back to the show, we have a great lineup of guests for you tonight.",
              "Can you pass the salt, and did you see what happened at the match yesterday."]
     voices = [v for v in ("kokoro:af_heart", "kokoro:am_michael", "kokoro:bf_emma", "piper:en_US-lessac-medium",
-                          "piper:en_GB-alba-medium", "polly:Joanna", "polly:Matthew") if not tts.available(v)]
+                          "piper:en_GB-alba-medium") if not tts.available(v)]
     if not voices:
         raise RuntimeError("babble needs at least one available TTS voice")
     x = np.zeros(t.size)
