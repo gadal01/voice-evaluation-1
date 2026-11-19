@@ -21,7 +21,7 @@ import re
 import statistics
 import sys
 import traceback
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Callable
@@ -172,15 +172,13 @@ def plan(opts: RunOptions) -> tuple[list[dict], list[str]]:
 
 async def execute(opts: RunOptions, run_dir: Path, on_result: Callable[[dict, int, int], None] | None = None) -> dict:
     """Runs every (scenario, mode, repeat) session against the agent, judges them, writes summary.json and report.html into
-    `run_dir`, and returns the summary. `on_result(result, done, total)` is called as each session finishes. Used by the CLI
-    and by the FastAPI layer."""
+    `run_dir`, and returns the summary. `on_result(result, done, total)` is called as each session finishes (the CLI
+    uses it to print PASS/FAIL)."""
     s = get_settings()
     scenarios, modes = plan(opts)
     url = opts.url or s.agent_url
     jobs = [(sc, m) for sc in scenarios for m in modes for _ in range(opts.repeat)]
     run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "run.json").write_text(json.dumps({"options": asdict(opts), "created": datetime.now().isoformat(timespec="seconds"),
-                                                  "total": len(jobs)}, indent=2), encoding="utf-8")
     sem = asyncio.Semaphore(opts.concurrency)
     results: list[dict] = []
 

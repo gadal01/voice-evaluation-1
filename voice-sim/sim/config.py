@@ -5,18 +5,12 @@
     AWS_BEARER_TOKEN_BEDROCK   Bedrock API key for the simulated user (dynamic mode) and the LLM judge
     AWS_REGION                 Bedrock region (default us-east-1)
     JUDGE_MODEL / USER_MODEL   Bedrock model ids (default Nova Pro; any Converse-capable model works)
-
-  The FastAPI layer (python -m sim.api):
-    SIM_API_KEY                key clients send as X-API-Key (falls back to AUTH_API_KEY when unset)
-    API_PORT                   listening port (default 8100)
-    RESULTS_DIR                where runs are written and served from (default ./results)
-    MAX_ACTIVE_RUNS            runs allowed at once through the API (default 1: every run costs money)
+    RESULTS_DIR                where runs are written (default ./results)
 """
 from functools import lru_cache
 from pathlib import Path
 
 from dotenv import find_dotenv
-from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -32,10 +26,7 @@ class Settings(BaseSettings):
     judge_model: str = "us.amazon.nova-pro-v1:0"
     user_model: str = "us.amazon.nova-pro-v1:0"
 
-    sim_api_key: str = ""
-    api_port: int = Field(8100, ge=1, le=65535)
     results_dir: Path = ROOT / "results"
-    max_active_runs: int = Field(1, ge=1, le=8)
 
 
 @lru_cache

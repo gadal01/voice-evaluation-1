@@ -1,2 +1,4 @@
 -r requirements.txt
 pytest==9.2.0
+fastapi==0.164.0                  # the tests' fake voice agent (tests/fake_agent.py)
+uvicorn[standard]==0.54.0
